@@ -1,3 +1,4 @@
+//el importe de todas las librerias necesarias
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 

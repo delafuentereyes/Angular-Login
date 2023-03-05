@@ -35,7 +35,7 @@ export class AuthService {
       }
     })
   }
-
+  //buscar y guardar en la base de datos de firebase
   setUserData(user:any){
     const userRef: AngularFirestoreDocument<any> = this.afs.doc(
       `user/${user.uid}`
@@ -48,7 +48,7 @@ export class AuthService {
       merge:true
     });
   }
-
+  //metodo para logear
   login(email: string, password: string){
     return this.afAuth.signInWithEmailAndPassword(email, password)
     .then(result=>{
@@ -56,20 +56,21 @@ export class AuthService {
       this.afAuth.authState.subscribe(user=>{
         if(user){
           this.router.navigate(['home'])
+          this.messageService.add({severity:'success', summary: 'Éxito', detail: 'Hola de nuevo!'});
         }
       })
     }).catch(()=>{
-        this.messageService.add({severity:'error', summary: 'Error', detail: 'Message Content'});
+        this.messageService.add({severity:'error', summary: 'Ups!', detail: 'Comprueba los datos ingresados e inténtalo de nuevo'});
     })
   }
-
+  //metodo para registrarse
   register(email: string, password: string){
     return this.afAuth.createUserWithEmailAndPassword(email, password)
     .then(result=>{
       this.setUserData(result.user);
-      this.messageService.add({severity:'success', summary: 'Success', detail: 'Message Content'});
+      this.messageService.add({severity:'success', summary: 'Éxito', detail: 'La cuenta se creó correctamente'});
     }).catch(()=>{
-        this.messageService.add({severity:'error', summary: 'Error', detail: 'Message Content'});
+        this.messageService.add({severity:'error', summary: 'Ups!', detail: 'Algo salío mal. Inténtalo de nuevo'});
     })
   }
 }
