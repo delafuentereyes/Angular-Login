@@ -7,6 +7,8 @@ import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/compat
 import { Router } from '@angular/router';
 import { User } from '../models/user';
 
+import {MessageService} from 'primeng/api';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -16,7 +18,9 @@ export class AuthService {
   constructor(
     private afs: AngularFirestore,
     private afAuth: AngularFireAuth,
-    private router: Router
+    private router: Router,
+    private messageService: MessageService
+
   )
   //metodo que permite guardar los datos del usuario en el almacenamiento local en la store si la sesión está iniciada
   {
@@ -34,20 +38,19 @@ export class AuthService {
 
   setUserData(user:any){
     const userRef: AngularFirestoreDocument<any> = this.afs.doc(
-      `user/${user.id}`
+      `user/${user.uid}`
     );
     const userData: User = {
-      id: user.id,
-      correo: user.correo,
-      userName: user.userName
+      uid: user.uid,
+      email: user.email
     };
     return userRef.set(userData, {
       merge:true
     });
   }
 
-  login(correo: string, contraseña: string){
-    return this.afAuth.signInWithEmailAndPassword(correo, contraseña)
+  login(email: string, password: string){
+    return this.afAuth.signInWithEmailAndPassword(email, password)
     .then(result=>{
       this.setUserData(result.user);
       this.afAuth.authState.subscribe(user=>{
@@ -56,7 +59,17 @@ export class AuthService {
         }
       })
     }).catch(()=>{
+        this.messageService.add({severity:'error', summary: 'Error', detail: 'Message Content'});
+    })
+  }
 
+  register(email: string, password: string){
+    return this.afAuth.createUserWithEmailAndPassword(email, password)
+    .then(result=>{
+      this.setUserData(result.user);
+      this.messageService.add({severity:'success', summary: 'Success', detail: 'Message Content'});
+    }).catch(()=>{
+        this.messageService.add({severity:'error', summary: 'Error', detail: 'Message Content'});
     })
   }
 }
